@@ -1,0 +1,21 @@
+{
+  "name": "esp32",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "aedes": "^0.51.3",
+    "express": "^4.21.2",
+    "moment": "^2.30.1",
+    "mqtt": "^5.10.3",
+    "websocket-stream": "^5.5.2",
+    "ws": "^8.18.0"
+  }
+}
