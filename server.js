@@ -1,42 +1,67 @@
-const express = require('express');
-const aedes = require('aedes')(); // Broker MQTT
-const ws = require('websocket-stream'); // WebSocket para MQTT
-const http = require('http');
+const express = require("express");
+const bodyParser = require("body-parser");
+const aedes = require("aedes")();
+const cors = require("cors");
 
-// Configurações
-const PORT_EXPRESS = 3000; // Porta do servidor HTTP/Express
-const PORT_MQTT = 1883;    // Porta do broker MQTT
+const port = 5000;
 
 const app = express();
+app.use(cors());
+app.use(bodyParser.json());
 
-// Rota básica
-app.get('/', (req, res) => {
-  res.send('Servidor MQTT com Express está funcionando!');
+const mqttServer = require("net").createServer(aedes.handle);
+const mqttPort = 1883;
+
+mqttServer.listen(mqttPort, () => {
+  console.log("Mqtt Server is running on port " + mqttPort);
 });
 
-// Inicia o servidor HTTP para Express
-const httpServer = http.createServer(app);
-httpServer.listen(PORT_EXPRESS, () => {
-  console.log(`Servidor HTTP rodando em http://localhost:${PORT_EXPRESS}`);
+aedes.on("client", (client) => {
+  console.log("Client connected: ", client.id);
 });
 
-// Inicia o broker MQTT na porta especificada
-const mqttServer = http.createServer();
-ws.createServer({ server: mqttServer }, aedes.handle);
-mqttServer.listen(PORT_MQTT, () => {
-  console.log(`Broker MQTT rodando na porta ${PORT_MQTT}`);
+aedes.on("clientDisconnect", (client) => {
+  console.log("Client disconnected: ", client.id);
 });
 
-// Eventos do Broker MQTT
-aedes.on('client', (client) => {
-  console.log(`Cliente conectado: ${client.id}`);
+aedes.on("publish", (packet, client) => {
+
+  if(client){
+
+    console.log(
+      `Messagem recebida do cliente ${client.id} - Topico: ${packet.topic} -> Mensagem : ${packet.payload.toString()}`
+    );
+  }
 });
 
-aedes.on('clientDisconnect', (client) => {
-  console.log(`Cliente desconectado: ${client.id}`);
+
+
+
+app.get('/',(req,res)=>{
+res.send({message:"API MQTT RODANDO"});
 });
 
-aedes.on('publish', (packet, client) => {
-    console.log(`Mensagem publicada no tópico "${packet.topic}": ${packet.payload.toString()}`);
-  });
-  
+app.post('/echo',(req,res)=>{
+  const {email, senha} = req.body;
+  console.log(email);
+  console.log(senha);
+  res.send(req.body);
+})
+
+app.post('/send',(req,res)=>{
+try{
+  const mensagem = req.body.mensagem;
+  console.log(mensagem);
+  res.status(200).send({message:"Messagem publicada"});
+}catch(e){
+  throw new Error("falha o publicar mensagem")
+}
+})
+
+
+app.listen(port, () => {
+  console.log(`API MQTT rodando na porta ${port}`);
+});
+
+
+
