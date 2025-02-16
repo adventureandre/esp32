@@ -73,9 +73,6 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 
 
-
-  // Outras configurações de Wi-Fi, como definições de DHCP, podem ser adicionadas aqui
-
 }
 
 
@@ -136,7 +133,7 @@ void loop() {
 
     lastMsg = now;
 
-    client.publish("esp32/data", "esp32"); // Publica a mensagem "esp32" no tópico "esp32/data"
+    client.publish("esp32/data", "esp32 original"); // Publica a mensagem "esp32" no tópico "esp32/data"
 
   }
 

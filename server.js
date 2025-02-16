@@ -48,15 +48,26 @@ app.post('/echo',(req,res)=>{
   res.send(req.body);
 })
 
-app.post('/send',(req,res)=>{
-try{
-  const mensagem = req.body.mensagem;
-  console.log(mensagem);
-  res.status(200).send({message:"Messagem publicada"});
-}catch(e){
-  throw new Error("falha o publicar mensagem")
-}
-})
+app.post('/send', (req, res) => {
+  try {
+    const mensagem = req.body.mensagem;
+    const topico = req.body.topico || "esp32/data"; // Padrão para "esp32/data"
+    
+    if (!mensagem) {
+      return res.status(400).send({ error: "A mensagem é obrigatória" });
+    }
+
+    aedes.publish({ topic: topico, payload: mensagem }, () => {
+      console.log(`Mensagem publicada no tópico ${topico}: ${mensagem}`);
+    });
+
+    res.status(200).send({ message: "Mensagem publicada com sucesso" });
+
+  } catch (e) {
+    console.error("Falha ao publicar mensagem:", e);
+    res.status(500).send({ error: "Falha ao publicar mensagem" });
+  }
+});
 
 
 app.listen(port, () => {
