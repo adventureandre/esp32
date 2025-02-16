@@ -51,7 +51,7 @@ app.post('/echo',(req,res)=>{
 app.post('/send', (req, res) => {
   try {
     const mensagem = req.body.mensagem;
-    const topico = req.body.topico || "esp32/data"; // Padrão para "esp32/data"
+    const topico = req.body.topico || "server/data";
     
     if (!mensagem) {
       return res.status(400).send({ error: "A mensagem é obrigatória" });
